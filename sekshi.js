@@ -18,6 +18,7 @@ var redis = require("redis");
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
+var nconf = require("nconf");
 
 function Sekshi() {
     Sekshi.super_.call(this);
@@ -27,12 +28,20 @@ function Sekshi() {
 
 util.inherits(Sekshi, Plugged);
 
-Sekshi.prototype.start = function(credentials, room) {
-    this.login(credentials);
+Sekshi.prototype.start = function(config) {
+    nconf.use("file", { file: config });
+    nconf.load(function(err) {
+        if (err) {
+            console.error(err.message);
+            return;
+        }
+    });
+
+    this.login(nconf.get("credentials"));
 
     this.on(this.CONNECTED, function _onConnect() {
 
-        this.connect(room, function _onRoomJoinError(err) {
+        this.connect(nconf.get("room"), function _onRoomJoinError(err) {
             if(!err) {
                 this.on(this.CHAT, this.onMessage.bind(this));
             } else {
