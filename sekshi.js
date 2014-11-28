@@ -20,27 +20,21 @@ var util = require("util");
 var fs = require("fs");
 var nconf = require("nconf");
 
-function Sekshi() {
+function Sekshi(config_path) {
     Sekshi.super_.call(this);
+
+    this.config = nconf;
+    this.config.file(config_path || "./config.json");
+
     this.modules = [];
-    this.delimiter = '!';
+    this.delimiter = this.config.get("delimiter") || "!";
 }
 
 util.inherits(Sekshi, Plugged);
 
-Sekshi.prototype.start = function(config) {
-    nconf.use("file", { file: config });
-    nconf.load(function(err) {
-        if (err) {
-            console.error(err.message);
-            return;
-        }
-    });
-
-    this.delimiter = nconf.get("delimiter") || this.delimiter;
-
+Sekshi.prototype.start = function() {
     try {
-        this.login(nconf.get("credentials"));
+        this.login(this.config.get("credentials"));
     }
     catch (err) {
         console.error(err.message);
@@ -49,7 +43,7 @@ Sekshi.prototype.start = function(config) {
 
     this.on(this.CONNECTED, function _onConnect() {
 
-        this.connect(nconf.get("room"), function _onRoomJoinError(err) {
+        this.connect(this.config.get("room"), function _onRoomJoinError(err) {
             if(!err) {
                 this.on(this.CHAT, this.onMessage.bind(this));
             } else {

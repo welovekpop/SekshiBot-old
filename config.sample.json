@@ -3,5 +3,6 @@
     "email": "example@email.com",
     "password": "pass"
   },
-  "room": "plug-room"
+  "room": "plug-room",
+  "delimiter": "!"
 }
