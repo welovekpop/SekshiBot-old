@@ -37,7 +37,15 @@ Sekshi.prototype.start = function(config) {
         }
     });
 
-    this.login(nconf.get("credentials"));
+    this.delimiter = nconf.get("delimiter") || this.delimiter;
+
+    try {
+        this.login(nconf.get("credentials"));
+    }
+    catch (err) {
+        console.error(err.message);
+        return;
+    }
 
     this.on(this.CONNECTED, function _onConnect() {
 
