@@ -19,8 +19,6 @@ var path = require("path");
 var util = require("util");
 var fs = require("fs");
 
-var MODULES = "./sekshi/modules";
-
 function Sekshi() {
     Sekshi.super_.call(this);
     this.modules = [];
@@ -30,8 +28,6 @@ function Sekshi() {
 util.inherits(Sekshi, Plugged);
 
 Sekshi.prototype.start = function(credentials, room) {
-    this.loadModulesSync(MODULES);
-
     this.login(credentials);
 
     this.on(this.CONNECTED, function _onConnect() {
@@ -99,7 +95,6 @@ Sekshi.prototype.parseArguments = function(str, args) {
 };
 
 Sekshi.prototype.onMessage = function(msg) {
-    var t = process.hrtime();
     if(msg.message.charAt(0) === this.delimiter) {
         this.deleteMessage(msg.cid);
 
@@ -113,8 +108,8 @@ Sekshi.prototype.onMessage = function(msg) {
         args.unshift(self.getUserByID(msg.id, true));
 
         for(var i = 0, l = self.modules.length; i < l; i++) {
-            if(typeof self.modules[i].module[func] === "function") {
-                if(args[0].role >= self.modules[i].module.permission[func])
+            if(self.modules[i].enabled && typeof self.modules[i].module[func] === "function") {
+                if(args[0].role >= self.modules[i].module.permissions[func])
                     self.modules[i].module[func].apply(self.modules[i].module, args);
                 else
                     self.sendChat(['@', msg.username, " you don't have permission to use this command"].join(''), 5*1000);
@@ -124,7 +119,6 @@ Sekshi.prototype.onMessage = function(msg) {
     } else {
         console.log([msg.username, ": ", msg.message].join(''));
     }
-    console.log(process.hrtime(t));
 };
 
 //delimiter used for chat commands
@@ -148,18 +142,19 @@ Sekshi.prototype.loadModulesSync = function(modulePath) {
             var files = fs.readdirSync(modulePath);
 
             if(typeof files !== "undefined") {
-                for(var i = 0, l = files.length; i < l; i++) {
-                    if(files[i].slice(files[i].indexOf('.')) === "module.js")
-                        this.loadModulesSync(path.join(modulePath, files[i]));
-                }
+                for(var i = 0, l = files.length; i < l; i++)
+                    this.loadModulesSync(path.join(modulePath, files[i]));
             }
-        } else if(stat.isFile()) {
-            var module = require(modulePath);
 
-            this.modules.push({
-                enabled: true,
-                module: new module(this)
-            });
+        } else if(stat.isFile()) {
+            if(modulePath.slice(modulePath.indexOf('.') + 1) === "module.js") {
+                var module = require(["./", modulePath].join(''));
+
+                this.modules.push({
+                    enabled: true,
+                    module: new module(this)
+                });
+            }
         }
     }
 }

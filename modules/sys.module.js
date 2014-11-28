@@ -1,20 +1,25 @@
 function SysMod(sekshi) {
     this.sekshi = sekshi;
 
-    this.permission = {
+    this.permissions = {
         "moduleinfo": sekshi.USERROLE.COHOST,
         "listmodules": sekshi.USERROLE.COHOST
     };
 }
 
+SysMod.prototype.name = "System Module";
+SysMod.prototype.author = "Sooyou";
+SysMod.prototype.version = "0.1.1";
+SysMod.prototype.description = "Base Module";
+
 SysMod.prototype.moduleinfo = function(user, modulename) {
     for(var i = 0, l = this.sekshi.modules.length; i < l; i++) {
-        if(this.sekshi.modules[i].info.name === modulename) {
+        if(this.sekshi.modules[i].module.name === modulename) {
             this.sekshi.sendChat([
-                '@', user.username, " module information about : ", this.sekshi.modules[i].info.name,
-                " version: ", this.sekshi.modules[i].info.version,
-                " author: ", this.sekshi.modules[i].info.author,
-                " description: ", this.sekshi.modules[i].info.description
+                '@', user.username, " module information about : ", this.sekshi.modules[i].module.name,
+                " version: ", this.sekshi.modules[i].module.version,
+                " author: ", this.sekshi.modules[i].module.author,
+                " description: ", this.sekshi.modules[i].module.description
                 ].join(''));
             return;
         }
@@ -26,10 +31,8 @@ SysMod.prototype.moduleinfo = function(user, modulename) {
 SysMod.prototype.listmodules = function(user) {
     var mods = [];
 
-    console.log(this.sekshi.modules.length);
-
     for(var i = 0, l = this.sekshi.modules.length; i < l; i++)
-        mods.push(this.sekshi.modules[i].info.name);
+        mods.push(this.sekshi.modules[i].module.name);
 
     this.sekshi.sendChat(mods.join("; "));
 };

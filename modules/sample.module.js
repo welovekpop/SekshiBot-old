@@ -2,11 +2,16 @@ function Sample(sekshi) {
     this.str = "Hello Sample";
     this.sekshi = sekshi;
 
-    this.permission = {
+    this.permissions = {
     "hello": sekshi.USERROLE.NONE,
     "smple": sekshi.USERROLE.MANAGER
     };
 }
+
+Sample.prototype.name = "Sample Module";
+Sample.prototype.author = "Sooyou";
+Sample.prototype.version = "0.1.1";
+Sample.prototype.description = "Sample Module";
 
 Sample.prototype.hello = function() {
     this.sekshi.sendChat("sample module");
