@@ -9,6 +9,7 @@
     "redis": "*",
     "mongoose": "*",
     "mongoose-auto-increment": "*",
-    "plugged": "*"
+    "plugged": "*",
+    "nconf": "*"
   }
 }

@@ -2,5 +2,8 @@
 logs
 *.log
 
+# Config file
+config.json
+
 # Dependency directory
 node_modules
