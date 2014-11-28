@@ -22,6 +22,7 @@ var fs = require("fs");
 var MODULES = "./sekshi/modules";
 
 function Sekshi() {
+    Sekshi.super_.call(this);
     this.modules = [];
     this.delimiter = '!';
 }
@@ -148,7 +149,6 @@ Sekshi.prototype.loadModulesSync = function(modulePath) {
 
             if(typeof files !== "undefined") {
                 for(var i = 0, l = files.length; i < l; i++) {
-                    console.log(files[i].slice(files[i].indexOf('.')));
                     if(files[i].slice(files[i].indexOf('.')) === "module.js")
                         this.loadModulesSync(path.join(modulePath, files[i]));
                 }
