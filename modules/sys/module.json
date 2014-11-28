@@ -1,7 +1,0 @@
-{
-    "name": "System Module",
-    "main": "sys.js",
-    "author": "Sooyou",
-    "version": "0.1.0",
-    "description": "makes it possible to retrieve information about modules etc."
-}
