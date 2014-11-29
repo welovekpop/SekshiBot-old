@@ -3,7 +3,8 @@ function SysMod(sekshi) {
 
     this.permissions = {
         "moduleinfo": sekshi.USERROLE.COHOST,
-        "listmodules": sekshi.USERROLE.COHOST
+        "listmodules": sekshi.USERROLE.COHOST,
+        "reloadmodules": sekshi.USERROLE.COHOST
     };
 }
 
@@ -28,6 +29,13 @@ SysMod.prototype.moduleinfo = function(user, modulename) {
     this.sekshi.sendChat(["no module called '", modulename, "' found."].join(''));
 };
 
+SysMod.prototype.reloadmodules = function(user, path) {
+    if(typeof path !== "undefined")
+        this.sekshi.reloadmodules();
+    else
+        this.sekshi.sendChat("!reloadmodules <path>");
+};
+
 SysMod.prototype.listmodules = function(user) {
     var mods = [];
 
@@ -39,9 +47,13 @@ SysMod.prototype.listmodules = function(user) {
 
 SysMod.prototype.disablemodule = function(user, modulename) {
     for(var i = 0, l = this.sekshi.modules.length; i < l; i++) {
-        if(this.sekshi.modules[i].info.name === modulename)
+        if(this.sekshi.modules[i].module.name === modulename)
             this.sekshi.modules[i].enabled = false;
     }
+};
+
+SysMod.prototype.destroy = function() {
+    this.sekshi = null;
 };
 
 module.exports = SysMod;
