@@ -137,11 +137,16 @@ Sekshi.prototype.setDelimiter = function(delimiter) {
     this.delimiter = delimiter;
 };
 
+Sekshi.prototype.reloadmodules = function(modulePath) {
+    this.unloadModulesSync(modulePath);
+    this.loadModulesSync(modulePath);
+};
+
 //get array of module files
 Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
     if(!fs.existsSync(modulePath)) {
         console.log(modulePath + " does not exist!");
-        return;
+        return [];
     }
 
     modules = modules || [];
@@ -192,8 +197,9 @@ Sekshi.prototype.unloadModulesSync = function(modulePath) {
     this.modules = [];
     var moduleFiles = this.getModuleFiles(modulePath);
 
-    for(var i = 0, l = moduleFiles.length; i < l; i++)
-        delete require.cache[moduleFiles[i]];
+    for(var i = 0, l = moduleFiles.length; i < l; i++) {
+        delete require.cache[path.resolve(moduleFiles[i])];
+    }
 };
 
 module.exports = Sekshi;
