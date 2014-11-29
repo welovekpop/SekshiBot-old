@@ -56,7 +56,7 @@ Sekshi.prototype.start = function() {
 };
 
 Sekshi.prototype.stop = function() {
-    this.unloadModules();
+    this.unloadModulesSync();
 
     this.logout(function _logout() {
         this.off(this.CHAT);
@@ -173,7 +173,7 @@ Sekshi.prototype.loadModulesSync = function(modulePath) {
     var module = null;
 
     for(var i = 0, l = moduleFiles.length; i < l; i++) {
-        module = require(["./", modulePath].join(''));
+        module = require(moduleFiles[i]);
 
         this.modules.push({
             enabled: true,
