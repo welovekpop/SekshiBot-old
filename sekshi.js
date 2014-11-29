@@ -15,10 +15,10 @@
 var mongoose = require("mongoose");
 var Plugged = require("plugged");
 var redis = require("redis");
+var nconf = require("nconf");
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
-var nconf = require("nconf");
 
 function Sekshi(config_path) {
     Sekshi.super_.call(this);
@@ -43,7 +43,7 @@ Sekshi.prototype.start = function() {
 
     this.on(this.CONNECTED, function _onConnect() {
 
-        this.connect(this.config.get("room"), function _onRoomJoinError(err) {
+        this.connect(this.config.get("room"), function _onRoomJoin(err) {
             if(!err) {
                 this.on(this.CHAT, this.onMessage.bind(this));
             } else {
@@ -137,13 +137,14 @@ Sekshi.prototype.setDelimiter = function(delimiter) {
     this.delimiter = delimiter;
 };
 
-//load all modules of a base path
-Sekshi.prototype.loadModulesSync = function(modulePath) {
+//get array of module files
+Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
     if(!fs.existsSync(modulePath)) {
         console.log(modulePath + " does not exist!");
         return;
     }
 
+    modules = modules || [];
     var stat = fs.statSync(modulePath);
 
     if(typeof stat === "undefined") {
@@ -154,30 +155,45 @@ Sekshi.prototype.loadModulesSync = function(modulePath) {
 
             if(typeof files !== "undefined") {
                 for(var i = 0, l = files.length; i < l; i++)
-                    this.loadModulesSync(path.join(modulePath, files[i]));
+                    this.getModuleFiles(path.join(modulePath, files[i]), modules);
             }
 
         } else if(stat.isFile()) {
-            if(modulePath.slice(modulePath.indexOf('.') + 1) === "module.js") {
-                var module = require(["./", modulePath].join(''));
-
-                this.modules.push({
-                    enabled: true,
-                    module: new module(this)
-                });
-            }
+            if(modulePath.slice(modulePath.indexOf('.') + 1) === "module.js")
+                modules.push(["./", modulePath].join(''));
         }
     }
-}
 
-Sekshi.prototype.unloadModules = function() {
+    return modules;
+};
+
+//load all modules of a base path
+Sekshi.prototype.loadModulesSync = function(modulePath) {
+    var moduleFiles = this.getModuleFiles(modulePath);
+    var module = null;
+
+    for(var i = 0, l = moduleFiles.length; i < l; i++) {
+        module = require(["./", modulePath].join(''));
+
+        this.modules.push({
+            enabled: true,
+            module: new module(this)
+        });
+    }
+};
+
+//unload all modules and delete the cached files
+Sekshi.prototype.unloadModulesSync = function(modulePath) {
     for(var i = 0, l = this.modules.length; i < l; i++) {
-        //make sure destroy exists
-        if(typeof this.modules[i].module !== "undefined" && typeof this.modules[i].module.destroy === "function")
+        if(typeof this.modules[i].module.destroy !== "undefined")
             this.modules[i].module.destroy();
     }
 
     this.modules = [];
+    var moduleFiles = this.getModuleFiles(modulePath);
+
+    for(var i = 0, l = moduleFiles.length; i < l; i++)
+        delete require.cache[moduleFiles[i]];
 };
 
 module.exports = Sekshi;
