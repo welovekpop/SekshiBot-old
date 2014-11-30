@@ -1,10 +1,4 @@
 /*****************************/
-/*         sekshi.js         */
-/*         by Sooyou         */
-/*                           */
-/*  Last Modified: 24/11/14  */
-/*  by: Sooyou               */
-/*****************************/
 /* Bot created for We <3 KPOP*/
 /*          on plug.dj.      */
 /*                           */
@@ -12,10 +6,10 @@
 /*    play.welovekpop.club   */
 /*****************************/
 
+var ConfigWrapper = require("./configwrapper");
 var mongoose = require("mongoose");
 var Plugged = require("plugged");
 var redis = require("redis");
-var nconf = require("nconf");
 var path = require("path");
 var util = require("util");
 var fs = require("fs");
@@ -25,12 +19,12 @@ function Sekshi(args) {
 
     args = args || {};
 
-    this.config = new nconf.Provider();
-    this.config.file(args["config"] || "./config.json") ;
+    this.config = new ConfigWrapper();
+    this.config.file(args["config"] || "./config.json");
 
     this.modules = [];
     this.modulePath = args["modules"] || "./modules";
-    this.delimiter = this.config.get("delimiter") || "!";
+    this.delimiter = this.config.get("delimiter") || '!';
 
     this.loadModulesSync();
 }
