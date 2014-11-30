@@ -26,10 +26,10 @@ function Sekshi(args) {
     args = args || {};
 
     this.config = new nconf.Provider();
-    this.config.file(("config" in args) ? args["config"] : "./config.json");
+    this.config.file(args["config"] || "./config.json") ;
 
     this.modules = [];
-    this.modulePath = ("modules" in args) ? args["modules"] : "./modules";
+    this.modulePath = args["modules"] || "./modules";
     this.delimiter = this.config.get("delimiter") || "!";
 
     this.loadModulesSync();
