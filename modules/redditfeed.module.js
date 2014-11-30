@@ -1,8 +1,20 @@
 function RedditFeed(bot) {
     this.bot = bot;
 
-    bot.config.set("redditfeed:subreddit", "kpop");
-    bot.config.save();
+    bot.config.defaults({
+    	"redditfeed:subreddits": "",
+    	"redditfeed:interval": 300,
+    	"redditfeed:format": "%feed | %title by %submitter | %link"
+    });
+
+    this.timer = {};
+    this.settings = bot.config.get("redditfeed");
+
+    console.info(this.settings);
+}
+
+RedditFeed.prototype.startTimer = function() {
+
 }
 
 RedditFeed.prototype.name = "RedditFeed";

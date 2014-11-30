@@ -20,14 +20,19 @@ var path = require("path");
 var util = require("util");
 var fs = require("fs");
 
-function Sekshi(config_path) {
+function Sekshi(args) {
     Sekshi.super_.call(this);
 
-    this.config = nconf;
-    this.config.file(config_path || "./config.json");
+    args = args || {};
+
+    this.config = new nconf.Provider();
+    this.config.file(("config" in args) ? args["config"] : "./config.json");
 
     this.modules = [];
+    this.modulePath = ("modules" in args) ? args["modules"] : "./modules";
     this.delimiter = this.config.get("delimiter") || "!";
+
+    this.loadModulesSync();
 }
 
 util.inherits(Sekshi, Plugged);
@@ -174,6 +179,8 @@ Sekshi.prototype.getModuleFiles = function(modulePath, modules) {
 
 //load all modules of a base path
 Sekshi.prototype.loadModulesSync = function(modulePath) {
+    modulePath = modulePath || this.modulePath;
+
     var moduleFiles = this.getModuleFiles(modulePath);
     var module = null;
 
@@ -189,6 +196,8 @@ Sekshi.prototype.loadModulesSync = function(modulePath) {
 
 //unload all modules and delete the cached files
 Sekshi.prototype.unloadModulesSync = function(modulePath) {
+    modulePath = modulePath || this.modulePath;
+
     for(var i = 0, l = this.modules.length; i < l; i++) {
         if(typeof this.modules[i].module.destroy !== "undefined")
             this.modules[i].module.destroy();

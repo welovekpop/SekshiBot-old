@@ -1,12 +1,10 @@
 var readline = require("readline");
 var Sekshi = require("./sekshi");
 
-var sekshi = new Sekshi("./config.json");
+var sekshi = new Sekshi();
 var rl = readline.createInterface(process.stdin, process.stdout);
 
-sekshi.loadModulesSync("./modules");
-
-//sekshi.start();
+sekshi.start();
 
 rl.setPrompt("Sekshi> ");
 rl.prompt();
@@ -14,43 +12,44 @@ rl.prompt();
 rl.on("line", function(line) {
     switch(line) {
         case "reloadmodules":
-        sekshi.unloadModulesSync("./modules");
-        sekshi.loadModulesSync("./modules");
-        break;
+            sekshi.unloadModulesSync();
+            sekshi.loadModulesSync();
+            break;
 
         case "unloadmodules":
-        sekshi.unloadModulesSync("./modules");
-        break;
+            sekshi.unloadModulesSync();
+            break;
 
         case "loadmodules":
-        sekshi.loadModulesSync("./modules");
-        break;
+            sekshi.loadModulesSync();
+            break;
 
         case "start":
-        sekshi.start();
-        break;
+            sekshi.start();
+            break;
 
         case "stop":
-        sekshi.stop();
-        break;
+            sekshi.stop();
+            break;
 
         case "exit":
-        process.exit(0);
-        break;
+            sekshi.stop();
+            process.exit(0);
+            break;
 
         case "help":
-        console.log("commands:\n\
-            reloadmodules: reloads all modules in module path.\n\
-            unloadmodules: unloads all modules in module path.\n\
-            loadmodules: loads all modules in module path.\n\
-            start: logs the bot in.\n\
-            stop: logs the bot out.\n\
-            exit: stops application.");
-        break;
+            console.log("commands:\n\
+                reloadmodules: reloads all modules in module path.\n\
+                unloadmodules: unloads all modules in module path.\n\
+                loadmodules: loads all modules in module path.\n\
+                start: logs the bot in.\n\
+                stop: logs the bot out.\n\
+                exit: stops application.");
+            break;
 
         default:
-        console.log("unknown command: " + line);
-        break;
+            console.log("unknown command: " + line);
+            break;
     }
     rl.prompt();
 });
