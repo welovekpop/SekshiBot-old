@@ -2,11 +2,9 @@ function RedditFeed(bot) {
     this.bot = bot;
 
     bot.config.defaults({
-    	"redditfeed": {
-            "subreddits": "",
-            "interval": 300,
-            "format": "%feed | %title by %submitter | %link"
-        }
+        "subreddits": "",
+        "interval": 300,
+        "format": "%feed | %title by %submitter | %link"
     });
 
     this.timer = {};
