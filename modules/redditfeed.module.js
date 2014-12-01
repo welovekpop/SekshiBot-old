@@ -16,7 +16,7 @@ function RedditFeed(bot) {
     this.lastPost = "";
 
     if (this.areSettingsValid())
-    	this.runTimer();
+        this.runTimer();
 }
 
 RedditFeed.prototype.name = "RedditFeed";
@@ -25,53 +25,53 @@ RedditFeed.prototype.version = "0.1";
 RedditFeed.prototype.description = "Announces new submissions from a configurable list of subreddits.";
 
 RedditFeed.prototype.runTimer = function() {
-	var subs = this.settings["subreddits"];
-	var promises = [];
-	var posts = [];
-	var reqs = [];
-	var chunk = 50;
+    var subs = this.settings["subreddits"];
+    var promises = [];
+    var posts = [];
+    var reqs = [];
+    var chunk = 50;
 
-	for (var i=0, j=subs.length; i<j; i+=chunk) {
-		reqs.push(subs.slice(i, i+chunk).join('+'));
-	}
+    for (var i=0, j=subs.length; i<j; i+=chunk) {
+        reqs.push(subs.slice(i, i+chunk).join('+'));
+    }
 
-	reqs.forEach(function(uri) {
-		var promise = reddit("/r/$subreddits/new").listing({
-			$subreddits: uri,
-			before: this.lastPost,
-			limit: 100
-		}).then(function(result) {
-			posts.concat(results.children);
-		});
+    reqs.forEach(function(uri) {
+        var promise = reddit("/r/$subreddits/new").listing({
+            $subreddits: uri,
+            before: this.lastPost,
+            limit: 100
+        }).then(function(result) {
+            posts.concat(results.children);
+        });
 
-		promises.push(promise);
-	}.bind(this));
+        promises.push(promise);
+    }.bind(this));
 
-	when.all(promises).then(function() {
-		if (!this.lastPost) return;
+    when.all(promises).then(function() {
+        if (!this.lastPost) return;
 
-		/*@TODO: post listing to chat*/
-	}.bind(this))
+        /*@TODO: post listing to chat*/
+    }.bind(this))
 
-	if (posts.length > 0)
-		this.lastPost = posts[0].data.name; 
-	/*@TODO: find a way to reliably get the most recent post */
+    if (posts.length > 0)
+        this.lastPost = posts[0].data.name; 
+    /*@TODO: find a way to reliably get the most recent post */
 }
 
 RedditFeed.prototype.areSettingsValid = function(settings) {
-	settings = settings || this.settings;
-	var valid = true;
+    settings = settings || this.settings;
+    var valid = true;
 
-	Object.keys(this.settings).forEach(function(key) {
-		if (this.settings[key] instanceof Array && this.settings[key].join('').length === 0)
-			valid = false;
-		else if (typeof this.settings[key] === "string" && this.settings[key].length === 0)
-			valid = false;
-		else if (typeof this.settings[key] === "number" && this.settings[key] <= 0)
-			valid = false;
-	}.bind(this));
+    Object.keys(this.settings).forEach(function(key) {
+        if (this.settings[key] instanceof Array && this.settings[key].join('').length === 0)
+            valid = false;
+        else if (typeof this.settings[key] === "string" && this.settings[key].length === 0)
+            valid = false;
+        else if (typeof this.settings[key] === "number" && this.settings[key] <= 0)
+            valid = false;
+    }.bind(this));
 
-	return valid;
+    return valid;
 }
 
 module.exports = RedditFeed;
