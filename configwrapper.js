@@ -19,20 +19,34 @@ ConfigWrapper.prototype.overrides = function(options) {
     config.overrides(obj);
 };
 
+ConfigWrapper.prototype.add = function(type, options) {
+    config.add(this.add.caller.name.toLowerCase(), { type: type, store: options });
+};
+
+ConfigWrapper.prototype.remove = function() {
+    config.remove(this.remove.caller.name.toLowerCase());
+};
+
 ConfigWrapper.prototype.file = function(file) {
     config.file(file);
 };
 
-ConfigWrapper.prototype.set = function(option) {
-    var key = this.set.caller.name.toLowerCase();
+ConfigWrapper.prototype.save = function(callback) {
+    callback = callback || function() {};
 
-    config.set(key + ':' + option);
+    config.save(callback);
 };
 
-ConfigWrapper.prototype.get = function(option) {
-    var key = this.get.caller.name.toLowerCase();
+ConfigWrapper.prototype.set = function(key, value) {
+    var space = this.set.caller.name.toLowerCase();
 
-    return config.get(option ? option : key);
+    config.set(space + ':' + key, option);
+};
+
+ConfigWrapper.prototype.get = function(key) {
+    var space = this.get.caller.name.toLowerCase();
+
+    return config.get(key ? key : space);
 };
 
 module.exports = ConfigWrapper;
