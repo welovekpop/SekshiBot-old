@@ -1,12 +1,13 @@
 var Snoocore = require("snoocore");
 var when = require("when");
+var util = require("util");
 
 function RedditFeed(bot) {
     this.bot = bot;
 
     bot.config.defaults({
         "subreddits": [],
-        "interval": 300,
+        "interval": 300000,
         "format": "%feed | %title by %submitter | %link"
     });
 
@@ -36,26 +37,33 @@ RedditFeed.prototype.runTimer = function() {
     }
 
     reqs.forEach(function(uri) {
-        var promise = reddit("/r/$subreddits/new").listing({
-            $subreddits: uri,
+        var promise = this.reddit("/r/$subreddit/new").listing({
+            $subreddit: uri,
             before: this.lastPost,
             limit: 100
         }).then(function(result) {
-            posts.concat(results.children);
+            posts = posts.concat(result.children);
+        }).catch(function(error) {
+            console.error(error);
         });
 
         promises.push(promise);
     }.bind(this));
 
     when.all(promises).then(function() {
-        if (!this.lastPost) return;
+        if (this.lastPost) {
+            /*@TODO: post listing to chat*/
+            console.info(posts);
+        }
 
-        /*@TODO: post listing to chat*/
+        if (posts.length > 0)
+            this.lastPost = posts[0].data.name; 
+
+        /*@TODO: find a way to reliably get the most recent post */
+        console.info("last post: " + this.lastPost);
+
+        setTimeout(this.runTimer.bind(this), this.settings["interval"]);
     }.bind(this))
-
-    if (posts.length > 0)
-        this.lastPost = posts[0].data.name; 
-    /*@TODO: find a way to reliably get the most recent post */
 }
 
 RedditFeed.prototype.areSettingsValid = function(settings) {
