@@ -55,13 +55,11 @@ Misc.prototype._onAdvance = function(booth, now, prev) {
         this.positionList[id] = entry;
     }.bind(this));
 
-    console.info("booth: " + booth.dj);
     if (this.positionList.hasOwnProperty(booth.dj) && this.positionList[booth.dj]) {
         delete this.positionList[booth.dj];
     }   
 
     this.clearOldPositions();
-    console.info(this.positionList);
 }
 
 Misc.prototype.initPositions = function() {
@@ -76,8 +74,6 @@ Misc.prototype.initPositions = function() {
 
         this.positionList[id] = entry;
     }.bind(this));   
-
-    console.info(this.positionList);
 }
 
 Misc.prototype.clearOldPositions = function(age) {
