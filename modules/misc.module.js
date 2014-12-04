@@ -8,7 +8,7 @@ function Misc(bot) {
 
     /*@TODO: only init positions once the bot is connected to a room*/
     this.initPositions();
-    this.bot.on(bot.ADVANCE, this._onAdvance.bind(this));
+    this.bot.on(this.bot.ADVANCE, this._onAdvance.bind(this));
 }
 
 Misc.prototype.destroy = function() {
@@ -23,12 +23,15 @@ Misc.prototype.description = "Miscellaneous user and mod commands.";
 Misc.prototype.dc = function(user) {
     if (this.positionList.hasOwnProperty(user.id) && this.positionList[user.id]) {
         if (!this.bot.isWaitlistLocked()) {
+            if (this.bot.getWaitlist().indexOf(user.id) === -1)
+                this.bot.addToWaitlist(user.id);
+
             this.bot.moveDJ(user.id, this.positionList[user.id].pos, function(err) {
                 if (err)
                     this.bot.sendChat([
-                        '@', user.username, " Error while moving you to position ", this.positionList[booth.dj], ": ", err
+                        '@', user.username, " Error while moving you to position ", this.positionList[user.id].pos, ": ", err.message
                         ].join(''));
-            });
+            }.bind(this));
         }
         else {
             this.bot.sendChat([
