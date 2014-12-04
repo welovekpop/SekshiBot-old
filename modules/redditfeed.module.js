@@ -17,7 +17,12 @@ function RedditFeed(bot) {
     this.lastPost = "";
 
     if (this.areSettingsValid())
-        this.runTimer();
+        this.timer = setTimeout(this.runTimer.bind(this), 0);
+}
+
+RedditFeed.prototype.destroy = function() {
+    if (this.timer)    
+        clearTimeout(this.timer);
 }
 
 RedditFeed.prototype.name = "RedditFeed";
@@ -53,16 +58,14 @@ RedditFeed.prototype.runTimer = function() {
     when.all(promises).then(function() {
         if (this.lastPost) {
             /*@TODO: post listing to chat*/
-            console.info(posts);
+            //console.info(posts);
         }
 
         if (posts.length > 0)
-            this.lastPost = posts[0].data.name; 
+            /*@TODO: find a way to reliably get the most recent post */
+            this.lastPost = posts[0].data.name;
 
-        /*@TODO: find a way to reliably get the most recent post */
-        console.info("last post: " + this.lastPost);
-
-        setTimeout(this.runTimer.bind(this), this.settings["interval"]);
+        this.timer = setTimeout(this.runTimer.bind(this), this.settings["interval"]);
     }.bind(this))
 }
 
